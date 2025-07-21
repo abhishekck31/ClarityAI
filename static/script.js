@@ -1,3 +1,36 @@
+
+// Dark Mode Functionality - Initialize immediately
+const themeToggle = document.getElementById('theme-toggle');
+if (themeToggle) {
+    const body = document.body;
+    const themeIcon = themeToggle.querySelector('.material-symbols-outlined');
+
+    // Check for saved theme preference or default to light mode
+    const savedTheme = localStorage.getItem('theme') || 'light';
+
+    // Apply the saved theme
+    if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        if (themeIcon) themeIcon.textContent = 'dark_mode';
+    } else {
+        body.classList.remove('dark-mode');
+        if (themeIcon) themeIcon.textContent = 'light_mode';
+    }
+
+    // Theme toggle event listener
+    themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+
+        if (body.classList.contains('dark-mode')) {
+            if (themeIcon) themeIcon.textContent = 'dark_mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            if (themeIcon) themeIcon.textContent = 'light_mode';
+            localStorage.setItem('theme', 'light');
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const clarifyButton = document.getElementById('clarifyButton');
     const userInput = document.getElementById('userInput');
@@ -20,99 +53,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedFile = null;
 
-    // Dark Mode Functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        const themeIcon = themeToggle.querySelector('.material-symbols-outlined');
-
-        // Check for saved theme preference or default to light mode
-        const savedTheme = localStorage.getItem('theme') || 'light';
-
-        // Apply the saved theme
-        if (savedTheme === 'dark') {
-            body.classList.add('dark-mode');
-            themeIcon.textContent = 'dark_mode';
-        } else {
-            body.classList.remove('dark-mode');
-            themeIcon.textContent = 'light_mode';
-        }
-
-        // Theme toggle event listener
-        themeToggle.addEventListener('click', function() {
-            body.classList.toggle('dark-mode');
-
-            if (body.classList.contains('dark-mode')) {
-                themeIcon.textContent = 'dark_mode';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                themeIcon.textContent = 'light_mode';
-                localStorage.setItem('theme', 'light');
-            }
-        });
-    });
-
     // Global variables
     let currentAnalysis = null;
     let originalText = '';
     let previousAnalysis = '';
 
     // Tab switching functionality
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tabName = button.dataset.tab;
+    if (tabButtons) {
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.dataset.tab;
 
-            // Update tab buttons
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
+                // Update tab buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
 
-            // Update tab content
-            tabContents.forEach(content => content.classList.remove('active'));
-            document.getElementById(tabName + 'Tab').classList.add('active');
+                // Update tab content
+                tabContents.forEach(content => content.classList.remove('active'));
+                const targetTab = document.getElementById(tabName + 'Tab');
+                if (targetTab) targetTab.classList.add('active');
 
-            // Reset file selection when switching to text tab
-            if (tabName === 'text') {
-                selectedFile = null;
-                filePreview.style.display = 'none';
-            }
+                // Reset file selection when switching to text tab
+                if (tabName === 'text') {
+                    selectedFile = null;
+                    if (filePreview) filePreview.style.display = 'none';
+                }
 
-            updateButtonState();
+                updateButtonState();
+            });
         });
-    });
+    }
 
     // File upload functionality
-    fileUploadArea.addEventListener('click', () => fileInput.click());
+    if (fileUploadArea && fileInput) {
+        fileUploadArea.addEventListener('click', () => fileInput.click());
 
-    fileUploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        fileUploadArea.classList.add('dragover');
-    });
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
 
-    fileUploadArea.addEventListener('dragleave', () => {
-        fileUploadArea.classList.remove('dragover');
-    });
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.classList.remove('dragover');
+        });
 
-    fileUploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        fileUploadArea.classList.remove('dragover');
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            handleFileSelection(files[0]);
-        }
-    });
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelection(files[0]);
+            }
+        });
 
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            handleFileSelection(e.target.files[0]);
-        }
-    });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelection(e.target.files[0]);
+            }
+        });
+    }
 
-    removeFile.addEventListener('click', () => {
-        selectedFile = null;
-        fileInput.value = '';
-        filePreview.style.display = 'none';
-        updateButtonState();
-    });
+    if (removeFile) {
+        removeFile.addEventListener('click', () => {
+            selectedFile = null;
+            if (fileInput) fileInput.value = '';
+            if (filePreview) filePreview.style.display = 'none';
+            updateButtonState();
+        });
+    }
 
     function handleFileSelection(file) {
         const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
@@ -128,121 +136,136 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         selectedFile = file;
-        fileName.textContent = file.name;
-        filePreview.style.display = 'block';
+        if (fileName) fileName.textContent = file.name;
+        if (filePreview) filePreview.style.display = 'block';
         updateButtonState();
     }
 
     // Auto-resize textarea
-    userInput.addEventListener('input', () => {
-        userInput.style.height = 'auto';
-        userInput.style.height = userInput.scrollHeight + 'px';
-        updateButtonState();
-    });
+    if (userInput) {
+        userInput.addEventListener('input', () => {
+            userInput.style.height = 'auto';
+            userInput.style.height = userInput.scrollHeight + 'px';
+            updateButtonState();
+        });
 
-    // Handle Enter key
-    userInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            if ((userInput.value.trim() || selectedFile) && !clarifyButton.disabled) {
-                clarifyButton.click();
+        // Handle Enter key
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if ((userInput.value.trim() || selectedFile) && clarifyButton && !clarifyButton.disabled) {
+                    clarifyButton.click();
+                }
             }
-        }
-    });
-
-    function updateButtonState() {
-        const activeTab = document.querySelector('.tab-button.active').dataset.tab;
-        const hasContent = (activeTab === 'text' && userInput.value.trim()) || 
-                          (activeTab === 'file' && selectedFile);
-
-        clarifyButton.disabled = !hasContent;
-        clarifyButton.querySelector('.button-text').textContent = hasContent ? 'Analyze Content' : 'Select content first';
+        });
     }
 
-    clarifyButton.addEventListener('click', async () => {
-        const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+    function updateButtonState() {
+        if (!clarifyButton) return;
+        
+        const activeTab = document.querySelector('.tab-button.active');
+        if (!activeTab) return;
+        
+        const tabName = activeTab.dataset.tab;
+        const hasContent = (tabName === 'text' && userInput && userInput.value.trim()) || 
+                          (tabName === 'file' && selectedFile);
 
-        if (activeTab === 'text' && !userInput.value.trim()) {
-            showError('Please enter some text or URL first!');
-            return;
+        clarifyButton.disabled = !hasContent;
+        const buttonText = clarifyButton.querySelector('.button-text');
+        if (buttonText) {
+            buttonText.textContent = hasContent ? 'Analyze Content' : 'Select content first';
         }
+    }
 
-        if (activeTab === 'file' && !selectedFile) {
-            showError('Please select a file first!');
-            return;
-        }
+    if (clarifyButton) {
+        clarifyButton.addEventListener('click', async () => {
+            const activeTab = document.querySelector('.tab-button.active');
+            if (!activeTab) return;
+            
+            const tabName = activeTab.dataset.tab;
 
-        // Show loading state
-        showLoading();
-        clarifyButton.disabled = true;
-        followupSection.style.display = 'none';
-        followupResponse.style.display = 'none';
-
-        try {
-            let response;
-
-            if (activeTab === 'file') {
-                // Handle file upload
-                const formData = new FormData();
-                formData.append('file', selectedFile);
-
-                response = await fetch('/clarify', {
-                    method: 'POST',
-                    body: formData,
-                });
-            } else {
-                // Handle text/URL input
-                response = await fetch('/clarify', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ text: userInput.value.trim() }),
-                });
-            }
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            if (data.error) {
-                showError(`Error: ${data.error}`);
+            if (tabName === 'text' && (!userInput || !userInput.value.trim())) {
+                showError('Please enter some text or URL first!');
                 return;
             }
 
-            // Store original text and analysis for follow-ups
-            originalText = data.original_text || userInput.value.trim();
-            previousAnalysis = data.ai_response;
+            if (tabName === 'file' && !selectedFile) {
+                showError('Please select a file first!');
+                return;
+            }
 
-            // Parse AI response
-            let aiData;
+            // Show loading state
+            showLoading();
+            clarifyButton.disabled = true;
+            if (followupSection) followupSection.style.display = 'none';
+            if (followupResponse) followupResponse.style.display = 'none';
+
             try {
-                aiData = JSON.parse(data.ai_response);
-            } catch (parseError) {
-                console.error('JSON Parse Error:', parseError);
-                showError('The AI response was not in the expected format. Please try again.');
-                return;
+                let response;
+
+                if (tabName === 'file') {
+                    // Handle file upload
+                    const formData = new FormData();
+                    formData.append('file', selectedFile);
+
+                    response = await fetch('/clarify', {
+                        method: 'POST',
+                        body: formData,
+                    });
+                } else {
+                    // Handle text/URL input
+                    response = await fetch('/clarify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ text: userInput.value.trim() }),
+                    });
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showError(`Error: ${data.error}`);
+                    return;
+                }
+
+                // Store original text and analysis for follow-ups
+                originalText = data.original_text || (userInput ? userInput.value.trim() : '');
+                previousAnalysis = data.ai_response;
+
+                // Parse AI response
+                let aiData;
+                try {
+                    aiData = JSON.parse(data.ai_response);
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', parseError);
+                    showError('The AI response was not in the expected format. Please try again.');
+                    return;
+                }
+
+                if (!aiData || typeof aiData !== 'object') {
+                    showError('Invalid response format received from AI.');
+                    return;
+                }
+
+                // Show results and follow-up options
+                showResults(aiData);
+                if (followupSection) followupSection.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Sorry, something went wrong. Please check your connection and try again.');
+            } finally {
+                clarifyButton.disabled = false;
+                updateButtonState();
             }
-
-            if (!aiData || typeof aiData !== 'object') {
-                showError('Invalid response format received from AI.');
-                return;
-            }
-
-            // Show results and follow-up options
-            showResults(aiData);
-            followupSection.style.display = 'block';
-
-        } catch (error) {
-            console.error('Error:', error);
-            showError('Sorry, something went wrong. Please check your connection and try again.');
-        } finally {
-            clarifyButton.disabled = false;
-            updateButtonState();
-        }
-    });
+        });
+    }
 
     // Follow-up functionality
     document.addEventListener('click', async (e) => {
@@ -253,6 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function handleFollowup(question) {
+        if (!followupContent || !followupResponse) return;
+        
         followupContent.innerHTML = '<div class="loading">Processing follow-up...</div>';
         followupResponse.style.display = 'block';
 
@@ -297,18 +322,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showLoading() {
+        if (!outputSection || !resultsDiv) return;
+        
         outputSection.style.display = 'block';
         resultsDiv.innerHTML = '<div class="loading">Analyzing your content...</div>';
         outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function showError(message) {
+        if (!outputSection || !resultsDiv) return;
+        
         outputSection.style.display = 'block';
         resultsDiv.innerHTML = `<div class="error">${message}</div>`;
         outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function showResults(aiData) {
+        if (!resultsDiv || !outputSection) return;
+        
         const summary = aiData.summary || 'No summary available';
         const actionItems = Array.isArray(aiData.action_items) ? aiData.action_items : [];
         const deadlines = Array.isArray(aiData.deadlines) ? aiData.deadlines : [];
@@ -328,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             htmlOutput += `
                 <h3>Action Items</h3>
-                <p style="color: var(--text-secondary); font-style: italic;">No action items identified</p>
+                <p style="color: var(--subtle-text-color); font-style: italic;">No action items identified</p>
             `;
         }
 
@@ -342,11 +373,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             htmlOutput += `
                 <h3>Deadlines</h3>
-                <p style="color: var(--text-secondary); font-style: italic;">No deadlines identified</p>
+                <p style="color: var(--subtle-text-color); font-style: italic;">No deadlines identified</p>
             `;
         }
 
         resultsDiv.innerHTML = htmlOutput;
+        resultsDiv.style.display = 'block';
         outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
