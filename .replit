@@ -19,7 +19,7 @@ localPort = 81
 externalPort = 80
 
 [workflows]
-runButton = "Run Next.js Dev"
+runButton = "Run Flask App"
 
 [[workflows.workflow]]
 name = "Run Next.js Dev"
@@ -29,3 +29,12 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Run Flask App"
+author = 35955817
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
