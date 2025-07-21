@@ -4,49 +4,168 @@ document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('userInput');
     const resultsDiv = document.getElementById('results');
     const outputSection = document.getElementById('outputSection');
+    const followupSection = document.getElementById('followupSection');
+    const followupResponse = document.getElementById('followupResponse');
+    const followupContent = document.getElementById('followupContent');
+    
+    // File upload elements
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const removeFile = document.getElementById('removeFile');
+    
+    // Tab elements
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    let selectedFile = null;
+    let originalText = '';
+    let previousAnalysis = '';
+
+    // Tab switching functionality
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabName = button.dataset.tab;
+            
+            // Update tab buttons
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Update tab content
+            tabContents.forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Reset file selection when switching to text tab
+            if (tabName === 'text') {
+                selectedFile = null;
+                filePreview.style.display = 'none';
+            }
+            
+            updateButtonState();
+        });
+    });
+
+    // File upload functionality
+    fileUploadArea.addEventListener('click', () => fileInput.click());
+    
+    fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
+    
+    fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('dragover');
+    });
+    
+    fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelection(files[0]);
+        }
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileSelection(e.target.files[0]);
+        }
+    });
+    
+    removeFile.addEventListener('click', () => {
+        selectedFile = null;
+        fileInput.value = '';
+        filePreview.style.display = 'none';
+        updateButtonState();
+    });
+
+    function handleFileSelection(file) {
+        const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+        
+        if (!allowedTypes.includes(file.type)) {
+            showError('Please select a PDF, DOCX, or TXT file.');
+            return;
+        }
+        
+        if (file.size > 16 * 1024 * 1024) {
+            showError('File size must be less than 16MB.');
+            return;
+        }
+        
+        selectedFile = file;
+        fileName.textContent = file.name;
+        filePreview.style.display = 'block';
+        updateButtonState();
+    }
 
     // Auto-resize textarea
     userInput.addEventListener('input', () => {
         userInput.style.height = 'auto';
         userInput.style.height = userInput.scrollHeight + 'px';
+        updateButtonState();
     });
 
-    // Enable/disable button based on input
-    userInput.addEventListener('input', () => {
-        const hasText = userInput.value.trim().length > 0;
-        clarifyButton.disabled = !hasText;
-        clarifyButton.querySelector('.button-text').textContent = hasText ? 'Clarify Text' : 'Enter text first';
-    });
-
-    // Handle Enter key (Shift+Enter for new line, Enter to submit)
+    // Handle Enter key
     userInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            if (userInput.value.trim() && !clarifyButton.disabled) {
+            if ((userInput.value.trim() || selectedFile) && !clarifyButton.disabled) {
                 clarifyButton.click();
             }
         }
     });
 
+    function updateButtonState() {
+        const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+        const hasContent = (activeTab === 'text' && userInput.value.trim()) || 
+                          (activeTab === 'file' && selectedFile);
+        
+        clarifyButton.disabled = !hasContent;
+        clarifyButton.querySelector('.button-text').textContent = hasContent ? 'Analyze Content' : 'Select content first';
+    }
+
     clarifyButton.addEventListener('click', async () => {
-        const text = userInput.value.trim();
-        if (!text) {
-            showError('Please enter some text first!');
+        const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+        
+        if (activeTab === 'text' && !userInput.value.trim()) {
+            showError('Please enter some text or URL first!');
+            return;
+        }
+        
+        if (activeTab === 'file' && !selectedFile) {
+            showError('Please select a file first!');
             return;
         }
 
         // Show loading state
         showLoading();
         clarifyButton.disabled = true;
+        followupSection.style.display = 'none';
+        followupResponse.style.display = 'none';
 
         try {
-            const response = await fetch('/clarify', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ text: text }),
-            });
+            let response;
+            
+            if (activeTab === 'file') {
+                // Handle file upload
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                
+                response = await fetch('/clarify', {
+                    method: 'POST',
+                    body: formData,
+                });
+            } else {
+                // Handle text/URL input
+                response = await fetch('/clarify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: userInput.value.trim() }),
+                });
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -59,37 +178,93 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // Store original text and analysis for follow-ups
+            originalText = data.original_text || userInput.value.trim();
+            previousAnalysis = data.ai_response;
+
             // Parse AI response
             let aiData;
             try {
                 aiData = JSON.parse(data.ai_response);
             } catch (parseError) {
                 console.error('JSON Parse Error:', parseError);
-                console.error('Raw AI Response:', data.ai_response);
                 showError('The AI response was not in the expected format. Please try again.');
                 return;
             }
 
-            // Validate AI response structure
             if (!aiData || typeof aiData !== 'object') {
                 showError('Invalid response format received from AI.');
                 return;
             }
 
-            // Show results
+            // Show results and follow-up options
             showResults(aiData);
+            followupSection.style.display = 'block';
 
         } catch (error) {
-            console.error('Network Error:', error);
+            console.error('Error:', error);
             showError('Sorry, something went wrong. Please check your connection and try again.');
         } finally {
             clarifyButton.disabled = false;
+            updateButtonState();
         }
     });
 
+    // Follow-up functionality
+    document.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('followup-btn')) {
+            const question = e.target.dataset.question;
+            await handleFollowup(question);
+        }
+    });
+
+    async function handleFollowup(question) {
+        followupContent.innerHTML = '<div class="loading">Processing follow-up...</div>';
+        followupResponse.style.display = 'block';
+
+        try {
+            const response = await fetch('/followup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    original_text: originalText,
+                    previous_analysis: previousAnalysis,
+                    question: question
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.error) {
+                followupContent.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                return;
+            }
+
+            let followupData;
+            try {
+                followupData = JSON.parse(data.ai_response);
+            } catch (parseError) {
+                followupContent.innerHTML = '<div class="error">Failed to parse follow-up response.</div>';
+                return;
+            }
+
+            followupContent.innerHTML = `<p>${escapeHtml(followupData.response || 'No response available')}</p>`;
+
+        } catch (error) {
+            console.error('Follow-up Error:', error);
+            followupContent.innerHTML = '<div class="error">Follow-up request failed. Please try again.</div>';
+        }
+    }
+
     function showLoading() {
         outputSection.style.display = 'block';
-        resultsDiv.innerHTML = '<div class="loading">Analyzing your text...</div>';
+        resultsDiv.innerHTML = '<div class="loading">Analyzing your content...</div>';
         outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
@@ -100,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showResults(aiData) {
-        // Ensure default values
         const summary = aiData.summary || 'No summary available';
         const actionItems = Array.isArray(aiData.action_items) ? aiData.action_items : [];
         const deadlines = Array.isArray(aiData.deadlines) ? aiData.deadlines : [];
@@ -149,6 +323,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initialize button state
-    clarifyButton.disabled = true;
-    clarifyButton.querySelector('.button-text').textContent = 'Enter text first';
+    updateButtonState();
 });

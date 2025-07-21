@@ -25,12 +25,35 @@
         <main class="main-content">
             <div class="chat-container">
                 <div class="input-section">
+                    <div class="input-tabs">
+                        <button class="tab-button active" data-tab="text">Text / URL</button>
+                        <button class="tab-button" data-tab="file">Upload File</button>
+                    </div>
+                    
                     <div class="input-wrapper">
-                        <textarea 
-                            id="userInput" 
-                            placeholder="Enter your notes, emails, or any text here..."
-                            rows="4"
-                        ></textarea>
+                        <div id="textTab" class="tab-content active">
+                            <textarea 
+                                id="userInput" 
+                                placeholder="Enter your notes, emails, URLs, or any text here..."
+                                rows="4"
+                            ></textarea>
+                        </div>
+                        
+                        <div id="fileTab" class="tab-content">
+                            <div class="file-upload-area" id="fileUploadArea">
+                                <div class="upload-icon">📄</div>
+                                <p class="upload-text">Drop files here or click to browse</p>
+                                <p class="upload-subtext">Supports PDF, DOCX, and TXT files (max 16MB)</p>
+                                <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden>
+                            </div>
+                            <div class="file-preview" id="filePreview" style="display: none;">
+                                <div class="file-info">
+                                    <span class="file-name" id="fileName"></span>
+                                    <button class="remove-file" id="removeFile">✕</button>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="input-actions">
                             <button id="clarifyButton" class="send-button">
                                 <span class="button-text">Clarify Text</span>
@@ -50,6 +73,24 @@
                         </div>
                     </div>
                     <div class="response-content" id="results"></div>
+                    <div class="followup-section" id="followupSection" style="display: none;">
+                        <h4>Ask follow-up questions:</h4>
+                        <div class="followup-buttons">
+                            <button class="followup-btn" data-question="Draft a professional email based on this summary">📧 Draft Email</button>
+                            <button class="followup-btn" data-question="Elaborate on the first action item with specific steps">🔍 Elaborate Steps</button>
+                            <button class="followup-btn" data-question="Estimate the time needed for these tasks">⏱️ Time Estimate</button>
+                            <button class="followup-btn" data-question="Identify potential risks or challenges with these tasks">⚠️ Identify Risks</button>
+                        </div>
+                    </div>
+                    <div class="followup-response" id="followupResponse" style="display: none;">
+                        <div class="followup-header">
+                            <div class="ai-badge">
+                                <div class="ai-icon">💭</div>
+                                <span>Follow-up Response</span>
+                            </div>
+                        </div>
+                        <div class="followup-content" id="followupContent"></div>
+                    </div>
                 </div>
             </div>
         </main>
