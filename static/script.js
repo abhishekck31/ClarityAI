@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Show a 'loading' message
-    resultsDiv.innerHTML = '<p>Clarifying your text...</p>';
+    resultsDiv.innerHTML = '<div class="loading">Clarifying your text...</div>';
 
     try {
       // Send the text to the backend "kitchen"
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await response.json();
 
       if (data.error) {
-        resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+        resultsDiv.innerHTML = `<div class="error">Error: ${data.error}</div>`;
         return;
       }
 
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         aiData = JSON.parse(data.ai_response);
       } catch (parseError) {
         console.error('JSON Parse Error:', parseError);
-        resultsDiv.innerHTML = '<p>The AI response was not in the expected format. Please try again.</p>';
+        resultsDiv.innerHTML = '<div class="error">The AI response was not in the expected format. Please try again.</div>';
         return;
       }
 
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (error) {
       console.error('Error:', error);
-      resultsDiv.innerHTML = '<p>Sorry, something went wrong. Please check the console.</p>';
+      resultsDiv.innerHTML = '<div class="error">Sorry, something went wrong. Please check the console.</div>';
     }
   });
 });
