@@ -1,26 +1,58 @@
+
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClarityAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css" />
-  </head>
-  <body>
-    <header>
-      <h1>ClarityAI ✨</h1>
-      <p>Turn your messy text into clear actions.</p>
-    </header>
-    <main>
-      <div class="input-container">
-        <h2>Your Text</h2>
-        <textarea id="userInput" placeholder="Paste your notes, emails, or any text here..."></textarea>
-        <button id="clarifyButton">Clarify Text</button>
-      </div>
-      <div class="output-container">
-        <h2>Your Results</h2>
-        <div id="results">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">✨</div>
+                    <h1>ClarityAI</h1>
+                </div>
+                <p class="subtitle">Turn your messy text into clear actions</p>
             </div>
-      </div>
-    </main>
+        </header>
+        
+        <main class="main-content">
+            <div class="chat-container">
+                <div class="input-section">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="userInput" 
+                            placeholder="Enter your notes, emails, or any text here..."
+                            rows="4"
+                        ></textarea>
+                        <div class="input-actions">
+                            <button id="clarifyButton" class="send-button">
+                                <span class="button-text">Clarify Text</span>
+                                <svg class="send-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="output-section" id="outputSection" style="display: none;">
+                    <div class="response-header">
+                        <div class="ai-badge">
+                            <div class="ai-icon">🤖</div>
+                            <span>ClarityAI</span>
+                        </div>
+                    </div>
+                    <div class="response-content" id="results"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-  </body>
+</body>
 </html>
