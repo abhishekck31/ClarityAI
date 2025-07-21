@@ -84,17 +84,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // Set example prompts based on feature
             let examplePrompt = '';
             switch (title) {
-                case 'URL context tool':
-                    examplePrompt = 'Analyze the content from this URL: https://example.com';
+                case 'Smart Summarization':
+                    examplePrompt = 'Meeting notes from today\'s project discussion: We reviewed the Q3 roadmap, discussed budget constraints, and assigned action items for next week.';
                     break;
-                case 'Native speech generation':
-                    examplePrompt = 'Create a speech about the importance of renewable energy';
+                case 'Action Item Extraction':
+                    examplePrompt = 'Project update: Need to finalize the proposal by Friday, schedule client meeting for next week, and review the budget with finance team.';
                     break;
-                case 'Live audio-to-audio dialog':
-                    examplePrompt = 'Help me practice a job interview conversation';
+                case 'Deadline Detection':
+                    examplePrompt = 'Important dates: Submit report by March 15th, team meeting on Monday at 2 PM, project deadline is end of month.';
                     break;
-                case 'Native image generation':
-                    examplePrompt = 'Generate an image of a futuristic city skyline at sunset';
+                case 'URL Analysis':
+                    examplePrompt = 'https://example.com/article';
                     break;
                 default:
                     examplePrompt = 'Analyze this text and extract key insights';
