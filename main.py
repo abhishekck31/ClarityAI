@@ -9,6 +9,8 @@ from docx import Document
 import io
 import re
 from urllib.parse import urlparse
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -260,4 +262,4 @@ def handle_followup():
         return jsonify({"error": f"Follow-up failed: {str(e)}"}), 500
 
 if __name__ == '__main__':
-  app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
