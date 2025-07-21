@@ -11,56 +11,7 @@
 </head>
 <body>
     <div class="app-container">
-        <header class="modern-header">
-            <div class="navbar-container">
-                <!-- Left: Logo -->
-                <div class="logo-section">
-                    <div class="brand-logo">
-                        <svg width="32" height="32" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <filter id="logo-glow">
-                                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                                    <feMerge> 
-                                        <feMergeNode in="coloredBlur"/>
-                                        <feMergeNode in="SourceGraphic"/>
-                                    </feMerge>
-                                </filter>
-                            </defs>
-                            <circle cx="20" cy="20" r="18" fill="none" stroke="#4fc3f7" stroke-width="2" filter="url(#logo-glow)"/>
-                            <path d="M12 15 L20 10 L28 15 L20 25 Z" fill="#4fc3f7" filter="url(#logo-glow)" opacity="0.9"/>
-                            <circle cx="20" cy="20" r="3" fill="#ffffff" filter="url(#logo-glow)"/>
-                        </svg>
-                        <span class="brand-text">ClarityAI</span>
-                    </div>
-                </div>
-
-                <!-- Center: Navigation Links -->
-                <div class="nav-links">
-                    <a href="#" class="nav-link active">ANALYZE</a>
-                    <a href="#features" class="nav-link">FEATURES</a>
-                </div>
-
-                <!-- Right: Action Buttons -->
-                <div class="action-buttons">
-                    <button id="shareBtn" class="action-btn secondary" title="Share results">
-                        <span class="material-symbols-outlined">share</span>
-                        <span>SHARE</span>
-                    </button>
-                    <button id="clearBtn" class="action-btn primary" title="Try ClarityAI">
-                        <span>TRY IT FOR FREE</span>
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </button>
-                    <button class="menu-toggle" id="menuToggle">
-                        <span class="menu-text">MENU</span>
-                        <div class="hamburger">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </header>
+        
 
         <main class="main-content">
             <div class="welcome-section" id="welcomeSection">

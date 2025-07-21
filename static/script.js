@@ -10,9 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorState = document.getElementById('errorState');
     const resultsContainer = document.getElementById('resultsContainer');
     const backButton = document.getElementById('backButton');
-    const clearBtn = document.getElementById('clearBtn');
-    const shareBtn = document.getElementById('shareBtn');
-    const menuToggle = document.getElementById('menuToggle');
+    
 
     // Store current analysis data
     let currentAnalysis = null;
@@ -59,41 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Handle clear button (now "Try it for free" button)
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            if (promptInput) {
-                promptInput.value = '';
-                promptInput.focus();
-            }
-            if (fileInput) fileInput.value = '';
-            currentAnalysis = null;
-            showWelcomeSection();
-        });
-    }
-
-    // Handle menu toggle
-    if (menuToggle) {
-        menuToggle.addEventListener('click', () => {
-            // Toggle hamburger animation
-            const hamburger = menuToggle.querySelector('.hamburger');
-            hamburger.classList.toggle('active');
-            
-            // Here you could add mobile menu functionality if needed
-            console.log('Menu toggle clicked');
-        });
-    }
-
-    // Handle share button
-    if (shareBtn) {
-        shareBtn.addEventListener('click', () => {
-            if (currentAnalysis) {
-                shareResults();
-            } else {
-                alert('No results to share. Please analyze some text first.');
-            }
-        });
-    }
+    
 
     function showWelcomeSection() {
         if (welcomeSection) welcomeSection.style.display = 'block';
@@ -317,8 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const deadlinesList = document.getElementById('deadlinesList');
     
     // Header controls
-    const shareBtn = document.getElementById('shareBtn');
-    const clearBtn = document.getElementById('clearBtn');
     const addFileBtn = document.getElementById('addFileBtn');
     const fileInput = document.getElementById('fileInput');
 
@@ -370,25 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Share functionality
-    if (shareBtn) {
-        shareBtn.addEventListener('click', () => {
-            if (currentResults) {
-                shareResults(currentResults);
-            } else {
-                showError('No results to share. Analyze some text first.');
-            }
-        });
-    }
-
-    // Clear functionality
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            if (promptInput) promptInput.value = '';
-            currentResults = null;
-            showWelcomeSection();
-        });
-    }
+    
 
     // Feature card clicks
     document.addEventListener('click', (e) => {
