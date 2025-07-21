@@ -16,11 +16,18 @@ except KeyError:
 
 # This is our "secret recipe" prompt that we send to the AI
 MASTER_PROMPT = """
-You are ClarityAI, an expert productivity assistant. Analyze the user's text.
-Respond with ONLY a valid JSON object with three keys: 'summary', 'action_items', 'deadlines'.
-'summary': A single sentence summary.
-'action_items': A list of tasks. If none, return an empty list [].
-'deadlines': A list of deadlines. If none, return an empty list [].
+You are ClarityAI, an expert productivity assistant. Analyze the user's text and respond with ONLY a valid JSON object.
+
+IMPORTANT: Your response must be ONLY valid JSON, no markdown, no explanations, no code blocks.
+
+Format your response exactly like this:
+{
+  "summary": "A single sentence summary of the text",
+  "action_items": ["task 1", "task 2"],
+  "deadlines": ["deadline 1", "deadline 2"]
+}
+
+If there are no action items or deadlines, use empty arrays [].
 """
 
 @app.route('/')
@@ -40,8 +47,29 @@ def clarify_text():
     
     try:
         response = model.generate_content(full_prompt)
+        
+        # Clean the response to extract only JSON
+        response_text = response.text.strip()
+        
+        # Remove markdown code blocks if present
+        if response_text.startswith("```json"):
+            response_text = response_text[7:]
+        if response_text.startswith("```"):
+            response_text = response_text[3:]
+        if response_text.endswith("```"):
+            response_text = response_text[:-3]
+        
+        # Find the JSON object in the response
+        start_idx = response_text.find('{')
+        end_idx = response_text.rfind('}')
+        
+        if start_idx != -1 and end_idx != -1:
+            json_text = response_text[start_idx:end_idx+1]
+        else:
+            json_text = response_text
+        
         # We send the AI's clean response back to the website
-        return jsonify({"ai_response": response.text})
+        return jsonify({"ai_response": json_text.strip()})
     except Exception as e:
         return jsonify({"error": f"AI generation failed: {str(e)}"}), 500
 
