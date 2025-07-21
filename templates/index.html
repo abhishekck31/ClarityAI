@@ -11,35 +11,52 @@
 </head>
 <body>
     <div class="app-container">
-        <header class="header">
-            <div class="neon-navbar">
-                <div class="logo-container">
-                    <div class="neon-logo">
-                        <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <header class="modern-header">
+            <div class="navbar-container">
+                <!-- Left: Logo -->
+                <div class="logo-section">
+                    <div class="brand-logo">
+                        <svg width="32" height="32" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                             <defs>
-                                <filter id="neon-glow">
-                                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <filter id="logo-glow">
+                                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
                                     <feMerge> 
                                         <feMergeNode in="coloredBlur"/>
                                         <feMergeNode in="SourceGraphic"/>
                                     </feMerge>
                                 </filter>
                             </defs>
-                            <circle cx="20" cy="20" r="18" fill="none" stroke="#87ceeb" stroke-width="2" filter="url(#neon-glow)"/>
-                            <path d="M12 15 L20 10 L28 15 L20 25 Z" fill="#87ceeb" filter="url(#neon-glow)" opacity="0.8"/>
-                            <circle cx="20" cy="20" r="3" fill="#ffffff" filter="url(#neon-glow)"/>
+                            <circle cx="20" cy="20" r="18" fill="none" stroke="#4fc3f7" stroke-width="2" filter="url(#logo-glow)"/>
+                            <path d="M12 15 L20 10 L28 15 L20 25 Z" fill="#4fc3f7" filter="url(#logo-glow)" opacity="0.9"/>
+                            <circle cx="20" cy="20" r="3" fill="#ffffff" filter="url(#logo-glow)"/>
                         </svg>
-                        <span class="neon-text">ClarityAI</span>
+                        <span class="brand-text">ClarityAI</span>
                     </div>
                 </div>
-                <div class="neon-controls">
-                    <button id="shareBtn" class="neon-button" title="Share results">
+
+                <!-- Center: Navigation Links -->
+                <div class="nav-links">
+                    <a href="#" class="nav-link active">ANALYZE</a>
+                    <a href="#features" class="nav-link">FEATURES</a>
+                </div>
+
+                <!-- Right: Action Buttons -->
+                <div class="action-buttons">
+                    <button id="shareBtn" class="action-btn secondary" title="Share results">
                         <span class="material-symbols-outlined">share</span>
-                        <span class="button-text">Share</span>
+                        <span>SHARE</span>
                     </button>
-                    <button id="clearBtn" class="neon-button" title="Clear all">
-                        <span class="material-symbols-outlined">refresh</span>
-                        <span class="button-text">Clear</span>
+                    <button id="clearBtn" class="action-btn primary" title="Try ClarityAI">
+                        <span>TRY IT FOR FREE</span>
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                    <button class="menu-toggle" id="menuToggle">
+                        <span class="menu-text">MENU</span>
+                        <div class="hamburger">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
                     </button>
                 </div>
             </div>
@@ -63,7 +80,7 @@
                 </div>
                 <input type="file" id="fileInput" accept=".txt,.pdf,.docx" style="display: none;">
 
-                <div class="whats-new">
+                <div class="whats-new" id="features">
                     <h2 class="section-subtitle">Features</h2>
                     <div class="feature-grid">
                         <div class="feature-card">

@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const backButton = document.getElementById('backButton');
     const clearBtn = document.getElementById('clearBtn');
     const shareBtn = document.getElementById('shareBtn');
+    const menuToggle = document.getElementById('menuToggle');
 
     // Store current analysis data
     let currentAnalysis = null;
@@ -58,13 +59,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Handle clear button
+    // Handle clear button (now "Try it for free" button)
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-            if (promptInput) promptInput.value = '';
+            if (promptInput) {
+                promptInput.value = '';
+                promptInput.focus();
+            }
             if (fileInput) fileInput.value = '';
             currentAnalysis = null;
             showWelcomeSection();
+        });
+    }
+
+    // Handle menu toggle
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            // Toggle hamburger animation
+            const hamburger = menuToggle.querySelector('.hamburger');
+            hamburger.classList.toggle('active');
+            
+            // Here you could add mobile menu functionality if needed
+            console.log('Menu toggle clicked');
         });
     }
 
