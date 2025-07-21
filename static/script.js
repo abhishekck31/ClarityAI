@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const clarifyButton = document.getElementById('clarifyButton');
     const userInput = document.getElementById('userInput');
@@ -7,19 +6,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const followupSection = document.getElementById('followupSection');
     const followupResponse = document.getElementById('followupResponse');
     const followupContent = document.getElementById('followupContent');
-    
+
     // File upload elements
     const fileUploadArea = document.getElementById('fileUploadArea');
     const fileInput = document.getElementById('fileInput');
     const filePreview = document.getElementById('filePreview');
     const fileName = document.getElementById('fileName');
     const removeFile = document.getElementById('removeFile');
-    
+
     // Tab elements
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
-    
+
     let selectedFile = null;
+
+    // Dark Mode Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const themeIcon = themeToggle.querySelector('.material-symbols-outlined');
+
+        // Check for saved theme preference or default to light mode
+        const savedTheme = localStorage.getItem('theme') || 'light';
+
+        // Apply the saved theme
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            themeIcon.textContent = 'dark_mode';
+        } else {
+            body.classList.remove('dark-mode');
+            themeIcon.textContent = 'light_mode';
+        }
+
+        // Theme toggle event listener
+        themeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode');
+
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.textContent = 'dark_mode';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.textContent = 'light_mode';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    });
+
+    // Global variables
+    let currentAnalysis = null;
     let originalText = '';
     let previousAnalysis = '';
 
@@ -27,37 +61,37 @@ document.addEventListener('DOMContentLoaded', () => {
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             const tabName = button.dataset.tab;
-            
+
             // Update tab buttons
             tabButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-            
+
             // Update tab content
             tabContents.forEach(content => content.classList.remove('active'));
             document.getElementById(tabName + 'Tab').classList.add('active');
-            
+
             // Reset file selection when switching to text tab
             if (tabName === 'text') {
                 selectedFile = null;
                 filePreview.style.display = 'none';
             }
-            
+
             updateButtonState();
         });
     });
 
     // File upload functionality
     fileUploadArea.addEventListener('click', () => fileInput.click());
-    
+
     fileUploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         fileUploadArea.classList.add('dragover');
     });
-    
+
     fileUploadArea.addEventListener('dragleave', () => {
         fileUploadArea.classList.remove('dragover');
     });
-    
+
     fileUploadArea.addEventListener('drop', (e) => {
         e.preventDefault();
         fileUploadArea.classList.remove('dragover');
@@ -66,13 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
             handleFileSelection(files[0]);
         }
     });
-    
+
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             handleFileSelection(e.target.files[0]);
         }
     });
-    
+
     removeFile.addEventListener('click', () => {
         selectedFile = null;
         fileInput.value = '';
@@ -82,17 +116,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleFileSelection(file) {
         const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-        
+
         if (!allowedTypes.includes(file.type)) {
             showError('Please select a PDF, DOCX, or TXT file.');
             return;
         }
-        
+
         if (file.size > 16 * 1024 * 1024) {
             showError('File size must be less than 16MB.');
             return;
         }
-        
+
         selectedFile = file;
         fileName.textContent = file.name;
         filePreview.style.display = 'block';
@@ -120,19 +154,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeTab = document.querySelector('.tab-button.active').dataset.tab;
         const hasContent = (activeTab === 'text' && userInput.value.trim()) || 
                           (activeTab === 'file' && selectedFile);
-        
+
         clarifyButton.disabled = !hasContent;
         clarifyButton.querySelector('.button-text').textContent = hasContent ? 'Analyze Content' : 'Select content first';
     }
 
     clarifyButton.addEventListener('click', async () => {
         const activeTab = document.querySelector('.tab-button.active').dataset.tab;
-        
+
         if (activeTab === 'text' && !userInput.value.trim()) {
             showError('Please enter some text or URL first!');
             return;
         }
-        
+
         if (activeTab === 'file' && !selectedFile) {
             showError('Please select a file first!');
             return;
@@ -146,12 +180,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             let response;
-            
+
             if (activeTab === 'file') {
                 // Handle file upload
                 const formData = new FormData();
                 formData.append('file', selectedFile);
-                
+
                 response = await fetch('/clarify', {
                     method: 'POST',
                     body: formData,

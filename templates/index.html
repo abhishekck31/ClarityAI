@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,92 +9,148 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="star-decoration">✦</div>
-        <div class="star-decoration">✧</div>
         <header class="header">
             <div class="header-content">
                 <div class="logo">
-                    <div class="logo-icon">✨</div>
-                    <h1>ClarityAI</h1>
+                    <div class="logo-icon">AI</div>
+                    <div>
+                        <h1 class="app-title">ClarityAI</h1>
+                        <span class="app-subtitle">AI-powered text analysis</span>
+                    </div>
                 </div>
-                <p class="subtitle">Transform complex text into actionable insights with AI</p>
+            </div>
+            <div class="header-controls">
+                <button id="theme-toggle" class="icon-button">
+                    <span class="material-symbols-outlined">light_mode</span>
+                </button>
             </div>
         </header>
-        
+
         <main class="main-content">
-            <div class="chat-container">
-                <div class="input-section">
+            <div class="input-section">
+                <h2 class="section-title">Input</h2>
+                <div class="input-container">
                     <div class="input-tabs">
-                        <button class="tab-button active" data-tab="text">Text / URL</button>
-                        <button class="tab-button" data-tab="file">Upload File</button>
+                        <button class="tab-button active" data-tab="text">Text</button>
+                        <button class="tab-button" data-tab="url">URL</button>
+                        <button class="tab-button" data-tab="file">File Upload</button>
                     </div>
-                    
-                    <div class="input-wrapper">
-                        <div id="textTab" class="tab-content active">
-                            <textarea 
-                                id="userInput" 
-                                placeholder="Enter your notes, emails, URLs, or any text here..."
-                                rows="4"
-                            ></textarea>
-                        </div>
-                        
-                        <div id="fileTab" class="tab-content">
-                            <div class="file-upload-area" id="fileUploadArea">
-                                <div class="upload-icon">📄</div>
-                                <p class="upload-text">Drop files here or click to browse</p>
-                                <p class="upload-subtext">Supports PDF, DOCX, and TXT files (max 16MB)</p>
-                                <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden>
+
+                    <div id="text-tab" class="tab-content active">
+                        <textarea id="textInput" class="input-textarea" placeholder="Paste your text here to analyze and extract key insights..."></textarea>
+                    </div>
+
+                    <div id="url-tab" class="tab-content">
+                        <textarea id="urlInput" class="input-textarea" placeholder="Enter a URL to analyze the content..."></textarea>
+                    </div>
+
+                    <div id="file-tab" class="tab-content">
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <div class="upload-icon">
+                                <span class="material-symbols-outlined">upload_file</span>
                             </div>
-                            <div class="file-preview" id="filePreview" style="display: none;">
-                                <div class="file-info">
-                                    <span class="file-name" id="fileName"></span>
-                                    <button class="remove-file" id="removeFile">✕</button>
-                                </div>
+                            <div class="upload-text">
+                                <strong>Click to upload</strong> or drag and drop<br>
+                                Supports: PDF, DOCX, TXT files
                             </div>
+                            <input type="file" id="fileInput" class="file-input" accept=".pdf,.docx,.txt">
                         </div>
-                        
-                        <div class="input-actions">
-                            <button id="clarifyButton" class="send-button">
-                                <span class="button-text">Clarify Text</span>
-                                <svg class="send-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
-                                </svg>
+                        <div id="selectedFile" class="selected-file" style="display: none;">
+                            <span class="material-symbols-outlined">description</span>
+                            <span id="fileName"></span>
+                            <button id="removeFile" class="remove-file">
+                                <span class="material-symbols-outlined">close</span>
                             </button>
                         </div>
                     </div>
+
+                    <div class="controls">
+                        <button id="analyzeButton" class="analyze-button">
+                            <span class="material-symbols-outlined">auto_awesome</span>
+                            Analyze
+                        </button>
+                        <button id="clearButton" class="secondary-button">Clear</button>
+                    </div>
                 </div>
-                
-                <div class="output-section" id="outputSection" style="display: none;">
-                    <div class="response-header">
-                        <div class="ai-badge">
-                            <div class="ai-icon">🤖</div>
-                            <span>ClarityAI</span>
-                        </div>
+            </div>
+
+            <div class="output-section">
+                <h2 class="section-title">Analysis Results</h2>
+                <div class="output-container">
+                    <div id="loadingState" class="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        Analyzing your content...
                     </div>
-                    <div class="response-content" id="results"></div>
-                    <div class="followup-section" id="followupSection" style="display: none;">
-                        <h4>Ask follow-up questions:</h4>
-                        <div class="followup-buttons">
-                            <button class="followup-btn" data-question="Draft a professional email based on this summary">📧 Draft Email</button>
-                            <button class="followup-btn" data-question="Elaborate on the first action item with specific steps">🔍 Elaborate Steps</button>
-                            <button class="followup-btn" data-question="Estimate the time needed for these tasks">⏱️ Time Estimate</button>
-                            <button class="followup-btn" data-question="Identify potential risks or challenges with these tasks">⚠️ Identify Risks</button>
+
+                    <div id="errorState" class="error" style="display: none;"></div>
+
+                    <div id="resultsContainer" style="display: none;">
+                        <div class="result-section">
+                            <h3 class="result-title">
+                                <span class="material-symbols-outlined">summarize</span>
+                                Summary
+                            </h3>
+                            <div class="result-content" id="summaryResult"></div>
                         </div>
-                    </div>
-                    <div class="followup-response" id="followupResponse" style="display: none;">
-                        <div class="followup-header">
-                            <div class="ai-badge">
-                                <div class="ai-icon">💭</div>
-                                <span>Follow-up Response</span>
+
+                        <div class="result-section">
+                            <h3 class="result-title">
+                                <span class="material-symbols-outlined">checklist</span>
+                                Action Items
+                            </h3>
+                            <div class="result-content">
+                                <ul id="actionItemsList" class="result-list"></ul>
                             </div>
                         </div>
-                        <div class="followup-content" id="followupContent"></div>
+
+                        <div class="result-section">
+                            <h3 class="result-title">
+                                <span class="material-symbols-outlined">schedule</span>
+                                Deadlines
+                            </h3>
+                            <div class="result-content">
+                                <ul id="deadlinesList" class="result-list"></ul>
+                            </div>
+                        </div>
+
+                        <div class="followup-section">
+                            <h3 class="result-title">
+                                <span class="material-symbols-outlined">help</span>
+                                Follow-up Questions
+                            </h3>
+                            <div class="followup-buttons">
+                                <button class="followup-button" data-question="Draft a professional email based on this summary">
+                                    <span class="material-symbols-outlined">mail</span>
+                                    Draft Email
+                                </button>
+                                <button class="followup-button" data-question="Elaborate on the first task mentioned">
+                                    <span class="material-symbols-outlined">zoom_in</span>
+                                    Elaborate on Task 1
+                                </button>
+                                <button class="followup-button" data-question="Estimate the time needed for these tasks">
+                                    <span class="material-symbols-outlined">timer</span>
+                                    Time Estimation
+                                </button>
+                                <button class="followup-button" data-question="Prioritize these action items by importance">
+                                    <span class="material-symbols-outlined">priority_high</span>
+                                    Prioritize Tasks
+                                </button>
+                            </div>
+                            <div id="followupResponse" class="followup-response" style="display: none;"></div>
+                        </div>
+
+                        <div class="controls">
+                            <button id="copyButton" class="secondary-button">
+                                <span class="material-symbols-outlined">content_copy</span>
+                                Copy Results
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
-    
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
