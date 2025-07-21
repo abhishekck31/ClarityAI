@@ -25,8 +25,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const data = await response.json();
 
+      if (data.error) {
+        resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+        return;
+      }
+
       // The AI's response is text that looks like JSON, so we parse it
-      const aiData = JSON.parse(data.ai_response);
+      let aiData;
+      try {
+        aiData = JSON.parse(data.ai_response);
+      } catch (parseError) {
+        console.error('JSON Parse Error:', parseError);
+        resultsDiv.innerHTML = '<p>The AI response was not in the expected format. Please try again.</p>';
+        return;
+      }
 
       // Format and display the results nicely
       let htmlOutput = `
