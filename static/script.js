@@ -43,9 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const summaryResult = document.getElementById('summaryResult');
     const actionItemsList = document.getElementById('actionItemsList');
     const deadlinesList = document.getElementById('deadlinesList');
+    
+    // Header controls
+    const fileUploadBtn = document.getElementById('fileUploadBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const addFileBtn = document.getElementById('addFileBtn');
+    const fileInput = document.getElementById('fileInput');
 
     // State
     let isAnalyzing = false;
+    let currentResults = null;
 
     // Auto-resize textarea
     if (promptInput) {
@@ -71,6 +79,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // Back button click
     if (backButton) {
         backButton.addEventListener('click', () => {
+            showWelcomeSection();
+        });
+    }
+
+    // File upload functionality
+    if (fileUploadBtn && fileInput) {
+        fileUploadBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+    }
+
+    if (addFileBtn && fileInput) {
+        addFileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                await handleFileUpload(file);
+            }
+        });
+    }
+
+    // Share functionality
+    if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+            if (currentResults) {
+                shareResults(currentResults);
+            } else {
+                showError('No results to share. Analyze some text first.');
+            }
+        });
+    }
+
+    // Clear functionality
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            if (promptInput) promptInput.value = '';
+            currentResults = null;
             showWelcomeSection();
         });
     }
@@ -138,6 +188,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (errorState) errorState.style.display = 'none';
         if (resultsContainer) resultsContainer.style.display = 'block';
 
+        // Store results for sharing
+        currentResults = data;
+
         // Populate summary
         if (summaryResult && data.summary) {
             summaryResult.textContent = data.summary;
@@ -177,6 +230,82 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.style.fontStyle = 'italic';
                 deadlinesList.appendChild(li);
             }
+        }
+    }
+
+    async function handleFileUpload(file) {
+        if (isAnalyzing) return;
+
+        isAnalyzing = true;
+        showAnalysisSection();
+        showLoading();
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('/clarify', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.error) {
+                showError(`Error: ${data.error}`);
+                return;
+            }
+
+            // Parse AI response
+            let aiData;
+            try {
+                aiData = JSON.parse(data.ai_response);
+            } catch (parseError) {
+                console.error('JSON Parse Error:', parseError);
+                showError('The AI response was not in the expected format. Please try again.');
+                return;
+            }
+
+            if (!aiData || typeof aiData !== 'object') {
+                showError('Invalid response format received from AI.');
+                return;
+            }
+
+            showResults(aiData);
+
+        } catch (error) {
+            console.error('Error:', error);
+            showError('Sorry, something went wrong. Please check your connection and try again.');
+        } finally {
+            isAnalyzing = false;
+        }
+    }
+
+    function shareResults(data) {
+        const shareText = `ClarityAI Analysis Results:\n\nSUMMARY:\n${data.summary}\n\nACTION ITEMS:\n${data.action_items.length > 0 ? data.action_items.map(item => `• ${item}`).join('\n') : '• No action items identified'}\n\nDEADLINES:\n${data.deadlines.length > 0 ? data.deadlines.map(item => `• ${item}`).join('\n') : '• No deadlines identified'}`;
+
+        if (navigator.share) {
+            navigator.share({
+                title: 'ClarityAI Analysis Results',
+                text: shareText,
+            }).catch(err => console.log('Error sharing:', err));
+        } else {
+            // Fallback to clipboard
+            navigator.clipboard.writeText(shareText).then(() => {
+                // Show temporary success message
+                const originalText = shareBtn.innerHTML;
+                shareBtn.innerHTML = '<span class="material-symbols-outlined">check</span>';
+                setTimeout(() => {
+                    shareBtn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+                showError('Could not copy results to clipboard.');
+            });
         }
     }
 

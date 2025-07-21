@@ -18,26 +18,14 @@
                 </div>
             </div>
             <div class="header-controls">
-                <button class="icon-button">
-                    <span class="material-symbols-outlined">article</span>
+                <button id="fileUploadBtn" class="icon-button" title="Upload file">
+                    <span class="material-symbols-outlined">upload_file</span>
                 </button>
-                <button class="icon-button">
-                    <span class="material-symbols-outlined">code</span>
-                </button>
-                <button class="icon-button">
+                <button id="shareBtn" class="icon-button" title="Share results">
                     <span class="material-symbols-outlined">share</span>
                 </button>
-                <button class="icon-button">
-                    <span class="material-symbols-outlined">library_books</span>
-                </button>
-                <button class="icon-button">
-                    <span class="material-symbols-outlined">tune</span>
-                </button>
-                <button class="icon-button">
+                <button id="clearBtn" class="icon-button" title="Clear all">
                     <span class="material-symbols-outlined">refresh</span>
-                </button>
-                <button class="icon-button">
-                    <span class="material-symbols-outlined">more_vert</span>
                 </button>
             </div>
         </header>
@@ -49,7 +37,7 @@
                 <div class="prompt-container">
                     <textarea id="promptInput" class="prompt-input" placeholder="Enter your text, paste a URL, or upload a file to clarify and organize →"></textarea>
                     <div class="prompt-controls">
-                        <button class="add-button">
+                        <button id="addFileBtn" class="add-button" title="Upload file">
                             <span class="material-symbols-outlined">add</span>
                         </button>
                         <button id="runButton" class="run-button">
@@ -58,6 +46,7 @@
                         </button>
                     </div>
                 </div>
+                <input type="file" id="fileInput" accept=".txt,.pdf,.docx" style="display: none;">
 
                 <div class="whats-new">
                     <h2 class="section-subtitle">Features</h2>
