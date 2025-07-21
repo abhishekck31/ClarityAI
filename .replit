@@ -17,3 +17,15 @@ deploymentTarget = "cloudrun"
 [[ports]]
 localPort = 81
 externalPort = 80
+
+[workflows]
+runButton = "Run Next.js Dev"
+
+[[workflows.workflow]]
+name = "Run Next.js Dev"
+author = 35955817
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
