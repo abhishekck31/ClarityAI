@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>ClarityAI</title>
-    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <header>
@@ -21,6 +21,6 @@
             </div>
       </div>
     </main>
-    <script src="script.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
   </body>
 </html>
