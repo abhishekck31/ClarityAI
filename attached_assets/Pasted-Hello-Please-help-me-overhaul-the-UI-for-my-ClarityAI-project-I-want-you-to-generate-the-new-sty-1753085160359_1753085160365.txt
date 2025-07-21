@@ -1,0 +1,98 @@
+Hello! Please help me overhaul the UI for my "ClarityAI" project. I want you to generate the new style.css, and the necessary additions for index.html and script.js to make the website look and feel like Google's AI Studio (aistudio.google.com), including a functional dark mode.
+
+Here are the detailed requirements:
+
+1. For style.css - The Complete Redesign
+
+Please generate a new style.css file that does the following:
+
+Use CSS Variables: Define all colors using CSS variables in the :root for easy theming.
+
+Font: Import and use the 'Roboto' font from Google Fonts.
+
+Light Mode Palette (Default):
+
+--background-color: #f8f9fa
+
+--container-color: #ffffff
+
+--text-color: #202124
+
+--subtle-text-color: #5f6368
+
+--accent-color: #1a73e8
+
+--accent-color-hover: #185abc
+
+--border-color: #dadce0
+
+--shadow-color: rgba(0, 0, 0, 0.1)
+
+Dark Mode Palette:
+
+Create a body.dark-mode selector that overrides the CSS variables:
+
+--background-color: #202124
+
+--container-color: #292a2d
+
+--text-color: #e8eaed
+
+--subtle-text-color: #9aa0a6
+
+--accent-color: #8ab4f8
+
+--accent-color-hover: #a3c5fb
+
+--border-color: #5f6368
+
+--shadow-color: rgba(0, 0, 0, 0.3)
+
+Layout:
+
+The body should use the background color and text color.
+
+The main two-column layout for input/output should be responsive and stack vertically on smaller screens.
+
+The header should be clean, and the history-section should be styled consistently.
+
+Styling:
+
+Containers (.input-container, etc.): Use --container-color, have a subtle box-shadow using --shadow-color, a light border using --border-color, and rounded corners (8px).
+
+Buttons: Style the main button with --accent-color background. On hover, use --accent-color-hover. Make the record button and dark mode toggle more subtle, perhaps as icon buttons.
+
+Textarea: Use a clean border and a blue focus ring on click.
+
+2. For index.html - Adding the Toggle & Icons
+
+Please tell me the code I need to add to my index.html file:
+
+In the <head>: Add the <link> tags for the 'Roboto' font and for Google Material Symbols to get sun/moon icons.
+
+In the <body>: Add a theme toggle button in the header. It should be a button with an ID like theme-toggle and contain a <span> for the icon.
+
+Example of the toggle button:
+<button id="theme-toggle" class="icon-button"><span class="material-symbols-outlined">light_mode</span></button>
+
+3. For script.js - Dark Mode Functionality
+
+Please provide the JavaScript code snippet that I should add to the top of my existing script.js file. This code must:
+
+Get the theme-toggle button element.
+
+Check the user's localStorage for a saved theme preference ('dark' or 'light') when the page loads.
+
+Apply the dark-mode class to the <body> if the saved theme is dark.
+
+Update the button's icon (to a moon or sun) based on the current theme.
+
+Add a click event listener to the button that:
+
+Toggles the dark-mode class on the <body>.
+
+Updates the button icon.
+
+Saves the new preference ('dark' or 'light') to localStorage.
+
+Please provide the complete, ready-to-use code based on these instructions.
