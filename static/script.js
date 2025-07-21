@@ -1,4 +1,3 @@
-
 // Dark Mode Functionality - Initialize immediately
 const themeToggle = document.getElementById('theme-toggle');
 if (themeToggle) {
@@ -32,266 +31,175 @@ if (themeToggle) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const clarifyButton = document.getElementById('clarifyButton');
-    const userInput = document.getElementById('userInput');
-    const resultsDiv = document.getElementById('results');
-    const outputSection = document.getElementById('outputSection');
-    const followupSection = document.getElementById('followupSection');
-    const followupResponse = document.getElementById('followupResponse');
-    const followupContent = document.getElementById('followupContent');
+    // Elements
+    const promptInput = document.getElementById('promptInput');
+    const runButton = document.getElementById('runButton');
+    const backButton = document.getElementById('backButton');
+    const welcomeSection = document.getElementById('welcomeSection');
+    const analysisSection = document.getElementById('analysisSection');
+    const loadingState = document.getElementById('loadingState');
+    const errorState = document.getElementById('errorState');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const summaryResult = document.getElementById('summaryResult');
+    const actionItemsList = document.getElementById('actionItemsList');
+    const deadlinesList = document.getElementById('deadlinesList');
 
-    // File upload elements
-    const fileUploadArea = document.getElementById('fileUploadArea');
-    const fileInput = document.getElementById('fileInput');
-    const filePreview = document.getElementById('filePreview');
-    const fileName = document.getElementById('fileName');
-    const removeFile = document.getElementById('removeFile');
-
-    // Tab elements
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    let selectedFile = null;
-
-    // Global variables
-    let currentAnalysis = null;
-    let originalText = '';
-    let previousAnalysis = '';
-
-    // Tab switching functionality
-    if (tabButtons) {
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const tabName = button.dataset.tab;
-
-                // Update tab buttons
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-
-                // Update tab content
-                tabContents.forEach(content => content.classList.remove('active'));
-                const targetTab = document.getElementById(tabName + 'Tab');
-                if (targetTab) targetTab.classList.add('active');
-
-                // Reset file selection when switching to text tab
-                if (tabName === 'text') {
-                    selectedFile = null;
-                    if (filePreview) filePreview.style.display = 'none';
-                }
-
-                updateButtonState();
-            });
-        });
-    }
-
-    // File upload functionality
-    if (fileUploadArea && fileInput) {
-        fileUploadArea.addEventListener('click', () => fileInput.click());
-
-        fileUploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            fileUploadArea.classList.add('dragover');
-        });
-
-        fileUploadArea.addEventListener('dragleave', () => {
-            fileUploadArea.classList.remove('dragover');
-        });
-
-        fileUploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            fileUploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFileSelection(files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFileSelection(e.target.files[0]);
-            }
-        });
-    }
-
-    if (removeFile) {
-        removeFile.addEventListener('click', () => {
-            selectedFile = null;
-            if (fileInput) fileInput.value = '';
-            if (filePreview) filePreview.style.display = 'none';
-            updateButtonState();
-        });
-    }
-
-    function handleFileSelection(file) {
-        const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-
-        if (!allowedTypes.includes(file.type)) {
-            showError('Please select a PDF, DOCX, or TXT file.');
-            return;
-        }
-
-        if (file.size > 16 * 1024 * 1024) {
-            showError('File size must be less than 16MB.');
-            return;
-        }
-
-        selectedFile = file;
-        if (fileName) fileName.textContent = file.name;
-        if (filePreview) filePreview.style.display = 'block';
-        updateButtonState();
-    }
+    // State
+    let isAnalyzing = false;
 
     // Auto-resize textarea
-    if (userInput) {
-        userInput.addEventListener('input', () => {
-            userInput.style.height = 'auto';
-            userInput.style.height = userInput.scrollHeight + 'px';
-            updateButtonState();
+    if (promptInput) {
+        promptInput.addEventListener('input', () => {
+            promptInput.style.height = 'auto';
+            promptInput.style.height = Math.min(promptInput.scrollHeight, 120) + 'px';
         });
 
-        // Handle Enter key
-        userInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+        // Handle Enter key (Ctrl+Enter to run)
+        promptInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
                 e.preventDefault();
-                if ((userInput.value.trim() || selectedFile) && clarifyButton && !clarifyButton.disabled) {
-                    clarifyButton.click();
-                }
+                handleAnalyze();
             }
         });
     }
 
-    function updateButtonState() {
-        if (!clarifyButton) return;
-        
-        const activeTab = document.querySelector('.tab-button.active');
-        if (!activeTab) return;
-        
-        const tabName = activeTab.dataset.tab;
-        const hasContent = (tabName === 'text' && userInput && userInput.value.trim()) || 
-                          (tabName === 'file' && selectedFile);
-
-        clarifyButton.disabled = !hasContent;
-        const buttonText = clarifyButton.querySelector('.button-text');
-        if (buttonText) {
-            buttonText.textContent = hasContent ? 'Analyze Content' : 'Select content first';
-        }
+    // Run button click
+    if (runButton) {
+        runButton.addEventListener('click', handleAnalyze);
     }
 
-    if (clarifyButton) {
-        clarifyButton.addEventListener('click', async () => {
-            const activeTab = document.querySelector('.tab-button.active');
-            if (!activeTab) return;
-            
-            const tabName = activeTab.dataset.tab;
-
-            if (tabName === 'text' && (!userInput || !userInput.value.trim())) {
-                showError('Please enter some text or URL first!');
-                return;
-            }
-
-            if (tabName === 'file' && !selectedFile) {
-                showError('Please select a file first!');
-                return;
-            }
-
-            // Show loading state
-            showLoading();
-            clarifyButton.disabled = true;
-            if (followupSection) followupSection.style.display = 'none';
-            if (followupResponse) followupResponse.style.display = 'none';
-
-            try {
-                let response;
-
-                if (tabName === 'file') {
-                    // Handle file upload
-                    const formData = new FormData();
-                    formData.append('file', selectedFile);
-
-                    response = await fetch('/clarify', {
-                        method: 'POST',
-                        body: formData,
-                    });
-                } else {
-                    // Handle text/URL input
-                    response = await fetch('/clarify', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ text: userInput.value.trim() }),
-                    });
-                }
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.error) {
-                    showError(`Error: ${data.error}`);
-                    return;
-                }
-
-                // Store original text and analysis for follow-ups
-                originalText = data.original_text || (userInput ? userInput.value.trim() : '');
-                previousAnalysis = data.ai_response;
-
-                // Parse AI response
-                let aiData;
-                try {
-                    aiData = JSON.parse(data.ai_response);
-                } catch (parseError) {
-                    console.error('JSON Parse Error:', parseError);
-                    showError('The AI response was not in the expected format. Please try again.');
-                    return;
-                }
-
-                if (!aiData || typeof aiData !== 'object') {
-                    showError('Invalid response format received from AI.');
-                    return;
-                }
-
-                // Show results and follow-up options
-                showResults(aiData);
-                if (followupSection) followupSection.style.display = 'block';
-
-            } catch (error) {
-                console.error('Error:', error);
-                showError('Sorry, something went wrong. Please check your connection and try again.');
-            } finally {
-                clarifyButton.disabled = false;
-                updateButtonState();
-            }
+    // Back button click
+    if (backButton) {
+        backButton.addEventListener('click', () => {
+            showWelcomeSection();
         });
     }
 
-    // Follow-up functionality
-    document.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('followup-btn')) {
-            const question = e.target.dataset.question;
-            await handleFollowup(question);
+    // Feature card clicks
+    document.addEventListener('click', (e) => {
+        const featureCard = e.target.closest('.feature-card');
+        if (featureCard) {
+            const title = featureCard.querySelector('.feature-title').textContent;
+
+            // Set example prompts based on feature
+            let examplePrompt = '';
+            switch (title) {
+                case 'URL context tool':
+                    examplePrompt = 'Analyze the content from this URL: https://example.com';
+                    break;
+                case 'Native speech generation':
+                    examplePrompt = 'Create a speech about the importance of renewable energy';
+                    break;
+                case 'Live audio-to-audio dialog':
+                    examplePrompt = 'Help me practice a job interview conversation';
+                    break;
+                case 'Native image generation':
+                    examplePrompt = 'Generate an image of a futuristic city skyline at sunset';
+                    break;
+                default:
+                    examplePrompt = 'Analyze this text and extract key insights';
+            }
+
+            if (promptInput) {
+                promptInput.value = examplePrompt;
+                promptInput.focus();
+            }
         }
     });
 
-    async function handleFollowup(question) {
-        if (!followupContent || !followupResponse) return;
-        
-        followupContent.innerHTML = '<div class="loading">Processing follow-up...</div>';
-        followupResponse.style.display = 'block';
+    function showWelcomeSection() {
+        if (welcomeSection) welcomeSection.style.display = 'block';
+        if (analysisSection) analysisSection.style.display = 'none';
+        if (promptInput) promptInput.focus();
+    }
+
+    function showAnalysisSection() {
+        if (welcomeSection) welcomeSection.style.display = 'none';
+        if (analysisSection) analysisSection.style.display = 'block';
+    }
+
+    function showLoading() {
+        if (loadingState) loadingState.style.display = 'flex';
+        if (errorState) errorState.style.display = 'none';
+        if (resultsContainer) resultsContainer.style.display = 'none';
+    }
+
+    function showError(message) {
+        if (errorState) {
+            errorState.textContent = message;
+            errorState.style.display = 'block';
+        }
+        if (loadingState) loadingState.style.display = 'none';
+        if (resultsContainer) resultsContainer.style.display = 'none';
+    }
+
+    function showResults(data) {
+        if (loadingState) loadingState.style.display = 'none';
+        if (errorState) errorState.style.display = 'none';
+        if (resultsContainer) resultsContainer.style.display = 'block';
+
+        // Populate summary
+        if (summaryResult && data.summary) {
+            summaryResult.textContent = data.summary;
+        }
+
+        // Populate action items
+        if (actionItemsList && data.action_items) {
+            actionItemsList.innerHTML = '';
+            if (data.action_items.length > 0) {
+                data.action_items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    actionItemsList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = 'No action items identified';
+                li.style.color = 'var(--text-muted)';
+                li.style.fontStyle = 'italic';
+                actionItemsList.appendChild(li);
+            }
+        }
+
+        // Populate deadlines
+        if (deadlinesList && data.deadlines) {
+            deadlinesList.innerHTML = '';
+            if (data.deadlines.length > 0) {
+                data.deadlines.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    deadlinesList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = 'No deadlines identified';
+                li.style.color = 'var(--text-muted)';
+                li.style.fontStyle = 'italic';
+                deadlinesList.appendChild(li);
+            }
+        }
+    }
+
+    async function handleAnalyze() {
+        if (!promptInput || isAnalyzing) return;
+
+        const text = promptInput.value.trim();
+        if (!text) {
+            showError('Please enter some text to analyze');
+            return;
+        }
+
+        isAnalyzing = true;
+        showAnalysisSection();
+        showLoading();
 
         try {
-            const response = await fetch('/followup', {
+            const response = await fetch('/clarify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    original_text: originalText,
-                    previous_analysis: previousAnalysis,
-                    question: question
-                }),
+                body: JSON.stringify({ text: text }),
             });
 
             if (!response.ok) {
@@ -301,93 +209,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (data.error) {
-                followupContent.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                showError(`Error: ${data.error}`);
                 return;
             }
 
-            let followupData;
+            // Parse AI response
+            let aiData;
             try {
-                followupData = JSON.parse(data.ai_response);
+                aiData = JSON.parse(data.ai_response);
             } catch (parseError) {
-                followupContent.innerHTML = '<div class="error">Failed to parse follow-up response.</div>';
+                console.error('JSON Parse Error:', parseError);
+                showError('The AI response was not in the expected format. Please try again.');
                 return;
             }
 
-            followupContent.innerHTML = `<p>${escapeHtml(followupData.response || 'No response available')}</p>`;
+            if (!aiData || typeof aiData !== 'object') {
+                showError('Invalid response format received from AI.');
+                return;
+            }
+
+            showResults(aiData);
 
         } catch (error) {
-            console.error('Follow-up Error:', error);
-            followupContent.innerHTML = '<div class="error">Follow-up request failed. Please try again.</div>';
+            console.error('Error:', error);
+            showError('Sorry, something went wrong. Please check your connection and try again.');
+        } finally {
+            isAnalyzing = false;
         }
     }
 
-    function showLoading() {
-        if (!outputSection || !resultsDiv) return;
-        
-        outputSection.style.display = 'block';
-        resultsDiv.innerHTML = '<div class="loading">Analyzing your content...</div>';
-        outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function showError(message) {
-        if (!outputSection || !resultsDiv) return;
-        
-        outputSection.style.display = 'block';
-        resultsDiv.innerHTML = `<div class="error">${message}</div>`;
-        outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function showResults(aiData) {
-        if (!resultsDiv || !outputSection) return;
-        
-        const summary = aiData.summary || 'No summary available';
-        const actionItems = Array.isArray(aiData.action_items) ? aiData.action_items : [];
-        const deadlines = Array.isArray(aiData.deadlines) ? aiData.deadlines : [];
-
-        let htmlOutput = `
-            <h3>Summary</h3>
-            <p>${escapeHtml(summary)}</p>
-        `;
-
-        if (actionItems.length > 0) {
-            htmlOutput += `
-                <h3>Action Items</h3>
-                <ul>
-                    ${actionItems.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
-                </ul>
-            `;
-        } else {
-            htmlOutput += `
-                <h3>Action Items</h3>
-                <p style="color: var(--subtle-text-color); font-style: italic;">No action items identified</p>
-            `;
-        }
-
-        if (deadlines.length > 0) {
-            htmlOutput += `
-                <h3>Deadlines</h3>
-                <ul>
-                    ${deadlines.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
-                </ul>
-            `;
-        } else {
-            htmlOutput += `
-                <h3>Deadlines</h3>
-                <p style="color: var(--subtle-text-color); font-style: italic;">No deadlines identified</p>
-            `;
-        }
-
-        resultsDiv.innerHTML = htmlOutput;
-        resultsDiv.style.display = 'block';
-        outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // Initialize button state
-    updateButtonState();
+    // Initialize
+    showWelcomeSection();
 });
