@@ -12,21 +12,36 @@
 <body>
     <div class="app-container">
         <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <h1 class="app-title">ClarityAI</h1>
+            <div class="neon-navbar">
+                <div class="logo-container">
+                    <div class="neon-logo">
+                        <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <filter id="neon-glow">
+                                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                    <feMerge> 
+                                        <feMergeNode in="coloredBlur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <circle cx="20" cy="20" r="18" fill="none" stroke="#00ffff" stroke-width="2" filter="url(#neon-glow)"/>
+                            <path d="M12 15 L20 10 L28 15 L20 25 Z" fill="#00ffff" filter="url(#neon-glow)" opacity="0.8"/>
+                            <circle cx="20" cy="20" r="3" fill="#ffffff" filter="url(#neon-glow)"/>
+                        </svg>
+                        <span class="neon-text">ClarityAI</span>
+                    </div>
                 </div>
-            </div>
-            <div class="header-controls">
-                <button id="fileUploadBtn" class="icon-button" title="Upload file">
-                    <span class="material-symbols-outlined">upload_file</span>
-                </button>
-                <button id="shareBtn" class="icon-button" title="Share results">
-                    <span class="material-symbols-outlined">share</span>
-                </button>
-                <button id="clearBtn" class="icon-button" title="Clear all">
-                    <span class="material-symbols-outlined">refresh</span>
-                </button>
+                <div class="neon-controls">
+                    <button id="shareBtn" class="neon-button" title="Share results">
+                        <span class="material-symbols-outlined">share</span>
+                        <span class="button-text">Share</span>
+                    </button>
+                    <button id="clearBtn" class="neon-button" title="Clear all">
+                        <span class="material-symbols-outlined">refresh</span>
+                        <span class="button-text">Clear</span>
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -140,6 +155,13 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 ClarityAI. All rights reserved. | Powered by AI Technology</p>
+            </div>
+        </footer>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>

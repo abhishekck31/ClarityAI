@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const deadlinesList = document.getElementById('deadlinesList');
     
     // Header controls
-    const fileUploadBtn = document.getElementById('fileUploadBtn');
     const shareBtn = document.getElementById('shareBtn');
     const clearBtn = document.getElementById('clearBtn');
     const addFileBtn = document.getElementById('addFileBtn');
@@ -84,12 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // File upload functionality
-    if (fileUploadBtn && fileInput) {
-        fileUploadBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
-    }
-
     if (addFileBtn && fileInput) {
         addFileBtn.addEventListener('click', () => {
             fileInput.click();

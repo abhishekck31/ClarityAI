@@ -38,49 +38,133 @@ body {
     flex-direction: column;
 }
 
-/* Header */
+/* Header with Neon Effects */
 .header {
-    background-color: var(--header-color);
-    border-bottom: 1px solid var(--border-light);
-    padding: 12px 24px;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(45, 45, 48, 0.95));
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    padding: 16px 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+    animation: neon-flow 3s linear infinite;
+}
+
+@keyframes neon-flow {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.neon-navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+    z-index: 2;
 }
 
-.header-content {
+.logo-container {
     display: flex;
     align-items: center;
 }
 
-.app-title {
-    font-size: 20px;
-    font-weight: 400;
-    color: var(--text-color);
-}
-
-.header-controls {
+.neon-logo {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 12px;
+    padding: 8px 16px;
+    border-radius: 25px;
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.3),
+        inset 0 0 20px rgba(0, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
 
-.icon-button {
-    background: none;
-    border: none;
-    padding: 8px;
-    border-radius: 4px;
+.neon-logo:hover {
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.5),
+        inset 0 0 30px rgba(0, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.neon-text {
+    font-size: 24px;
+    font-weight: 600;
+    color: #00ffff;
+    text-shadow: 
+        0 0 10px #00ffff,
+        0 0 20px #00ffff,
+        0 0 30px #00ffff;
+    animation: neon-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes neon-pulse {
+    from {
+        text-shadow: 
+            0 0 10px #00ffff,
+            0 0 20px #00ffff,
+            0 0 30px #00ffff;
+    }
+    to {
+        text-shadow: 
+            0 0 15px #00ffff,
+            0 0 25px #00ffff,
+            0 0 35px #00ffff,
+            0 0 45px #00ffff;
+    }
+}
+
+.neon-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.neon-button {
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 10px 16px;
     cursor: pointer;
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
+    color: #00ffff;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    text-shadow: 0 0 10px #00ffff;
+    box-shadow: 
+        0 0 15px rgba(0, 255, 255, 0.2),
+        inset 0 0 15px rgba(0, 255, 255, 0.1);
 }
 
-.icon-button:hover {
-    background-color: var(--border-light);
-    color: var(--text-color);
+.neon-button:hover {
+    background: rgba(0, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 
+        0 0 25px rgba(0, 255, 255, 0.4),
+        inset 0 0 25px rgba(0, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.neon-button .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.button-text {
+    font-family: inherit;
 }
 
 .material-symbols-outlined {
@@ -389,9 +473,48 @@ body {
         padding: 12px 16px;
     }
 
-    .header-controls {
-        gap: 2px;
+    .neon-controls {
+        gap: 8px;
     }
+
+    .neon-button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .neon-button .button-text {
+        display: none;
+    }
+
+    .neon-text {
+        font-size: 20px;
+    }
+
+    .neon-logo svg {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* Footer */
+.footer {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(45, 45, 48, 0.95));
+    border-top: 1px solid rgba(0, 255, 255, 0.3);
+    padding: 20px 24px;
+    text-align: center;
+    margin-top: auto;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-content p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 0;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
 }
 
 /* Animations */
